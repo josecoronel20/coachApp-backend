@@ -1,7 +1,8 @@
 import { Router } from "express";
-import getCoachInfo from "../controllers/coachController";
+import coachController from "../controllers/coachController";
 const router = Router();
 
-router.get("/info", getCoachInfo);
+router.get("/info", coachController.getCoachInfo);
+router.post("/newAthlete", coachController.createNewAthlete);
 
 export default router;

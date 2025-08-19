@@ -96,4 +96,4 @@ const isAuthenticated = (req: any, res: any) => {
   return res.status(200).json({ message: "Autorizado" });
 };
 
-export { login, register, logout, isAuthenticated };
+export default { login, register, logout, isAuthenticated };
