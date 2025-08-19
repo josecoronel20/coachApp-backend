@@ -12,68 +12,88 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dataPath = path.join(__dirname, "../data/coachData.json");
 
-
 const login = (req: any, res: any) => {
-    const data = fs.readFileSync(dataPath, "utf8");
-    const coachs = JSON.parse(data);
+  const data = fs.readFileSync(dataPath, "utf8");
+  const coachs = JSON.parse(data);
 
-    const { email, password } = req.body;
-    const coach = coachs.find((coach: any) => coach.email === email);
+  const { email, password } = req.body;
+  console.log("email", email);
+  const coach = coachs.find((coach: any) => coach.email === email);
+  console.log("coach", coach);
 
-    //if coach not found return 401
-    if (!coach) {
-        return res.status(401).json({ message: "Invalid credentials" });
-    }
+  //if coach not found return 401
+  if (!coach) {
+    console.log("Credenciales incorrectas");
+    return res.status(401).json({ message: "Credenciales incorrectas" });
+  }
 
-    //if password is not valid return 401
-    const isPasswordValid = bcrypt.compareSync(password, coach.password);
-    if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid password" });
-    }
+  //if password is not valid return 401
+  const isPasswordValid = bcrypt.compareSync(password, coach.password);
+  if (!isPasswordValid) {
+    console.log("Contraseña incorrecta");
+    return res.status(401).json({ message: "Contraseña incorrecta" });
+  }
 
-    //if password is valid return 200 and token
-    const token = jwt.sign({ id: coach.id }, process.env.JWT_SECRET!, { expiresIn: "1h" });
+  //if password is valid return 200 and token
+  const token = jwt.sign({ id: coach.id }, process.env.JWT_SECRET!, {
+    expiresIn: "1h",
+  });
 
-    //save token in cookie
-    res.cookie("token", token, { httpOnly: true, secure: true, maxAge: 3600000 });
-    return res.status(200).json({ message: "Login successful" });
-}
+  //save token in cookie
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 3600000,
+    sameSite: "lax",
+  });
+  console.log("Inicio de sesión exitoso");
+  return res.status(200).json({ message: "Inicio de sesión exitoso" });
+};
 
 const register = (req: any, res: any) => {
-    const { email, password, name, confirmPassword } = req.body;
+  const { email, password, name, confirmPassword } = req.body;
 
-    const data = fs.readFileSync(dataPath, "utf8");
-    const coachs = JSON.parse(data);
+  const data = fs.readFileSync(dataPath, "utf8");
+  const coachs = JSON.parse(data);
 
+  const existingCoach = coachs.find((coach: any) => coach.email === email);
 
-    const existingCoach = coachs.find((coach: any) => coach.email === email);
+  //if email already exists return 400
+  if (existingCoach) {
+    console.log("Email ya existe");
+    return res.status(400).json({ message: "Email ya existe" });
+  }
 
-    //if email already exists return 400
-    if (existingCoach) {
-        console.log("Email already exists");
-        return res.status(400).json({ message: "Email already exists" });
-    }
+  //if password and confirmPassword are not the same return 400
+  if (password !== confirmPassword) {
+    console.log("La contraseña y la confirmación de la contraseña no coinciden");
+    return res
+      .status(400)
+      .json({ message: "La contraseña y la confirmación de la contraseña no coinciden" });
+  }
 
-    //if password and confirmPassword are not the same return 400
-    if (password !== confirmPassword) {
-        console.log("Password and confirmPassword are not the same");
-        return res.status(400).json({ message: "Password and confirmPassword are not the same" });
-    }
+  //hash password
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
-    //hash password
-    const hashedPassword = bcrypt.hashSync(password, 10);
+  const coach = { id: uuidv4(), email, password: hashedPassword, name };
+  coachs.push(coach);
+  fs.writeFileSync(dataPath, JSON.stringify(coachs, null, 2));
 
-    const coach = { id: uuidv4(), email, password: hashedPassword, name };
-    coachs.push(coach);
-    fs.writeFileSync(dataPath, JSON.stringify(coachs, null, 2));
-
-    console.log("Register successful");
-    return res.status(200).json({ message: "Register successful" });
-}
+  console.log("Registro exitoso");
+  return res.status(200).json({ message: "Registro exitoso" });
+};
 
 const logout = (req: any, res: any) => {
-    res.clearCookie("token");
-    return res.status(200).json({ message: "Logout successful" });
-}
+  res.clearCookie("token");
+  return res.status(200).json({ message: "Cierre de sesión exitoso" });
+};
 
-export { login, register, logout };
+const isAuthenticated = (req: any, res: any) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: "No autorizado" });
+  }
+  return res.status(200).json({ message: "Autorizado" });
+};
+
+export { login, register, logout, isAuthenticated };
