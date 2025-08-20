@@ -3,6 +3,7 @@ import authRoutes from "./routes/auth";
 import coachRoutes from "./routes/coach";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import protectedRoutes from "./routes/protected";
 
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -17,5 +18,6 @@ app.use(cookieParser());
 //routes
 app.use("/api/auth", authRoutes);
 app.use("/api/coach", coachRoutes);
+app.use("/api/protected", protectedRoutes);
 
 app.listen(3001, () => console.log("Server running on 3001"));

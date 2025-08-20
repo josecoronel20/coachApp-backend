@@ -74,4 +74,30 @@ const createNewAthlete = (req: any, res: any) => {
   });
 };
 
-export default { getCoachInfo, createNewAthlete };
+const getAthleteInfo = (req: any, res: any) => {
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const allAthletes = JSON.parse(data);
+  const { id } = req.params;
+
+  const athlete = allAthletes.find((athlete: any) => athlete.id === id);
+
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+
+  return res.status(200).json(athlete);
+};
+
+const getAllAthletes = (req: any, res: any) => {
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const allAthletes = JSON.parse(data);
+
+  const token = req.cookies.token;
+  const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+
+  const athletesFromCurrentCoach = allAthletes.filter((athlete: any) => athlete.coachId === decoded.id);
+
+  return res.status(200).json(athletesFromCurrentCoach);
+};
+
+export default { getCoachInfo, createNewAthlete, getAthleteInfo, getAllAthletes };
