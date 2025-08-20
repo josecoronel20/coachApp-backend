@@ -21,4 +21,45 @@ const updatePaymentDate = (req: any, res: any) => {
   return res.status(200).json({ message: "Fecha de pago actualizada" });
 };
 
-export default { updatePaymentDate };
+const deleteAthlete = (req: any, res: any) => {
+  const { id } = req.body;
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const athletes = JSON.parse(data);
+  const athlete = athletes.find((athlete: any) => athlete.id === id);
+
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+  const newAthletes = athletes.filter((athlete: any) => athlete.id !== id);
+  fs.writeFileSync(dataAthletePath, JSON.stringify(newAthletes, null, 2));
+  return res.status(200).json({ message: "Atleta eliminado" });
+};
+
+const updateAthleteBasicInfo = (req: any, res: any) => {
+  const { id,name, email, phone, notes } = req.body;
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const athletes = JSON.parse(data);
+  const athlete = athletes.find((athlete: any) => athlete.id === id);
+
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+
+  const existingPhone = athletes.find((athlete: any) => athlete.phone === phone);
+  if (existingPhone && existingPhone.id !== id) {
+    return res.status(400).json({ message: "El teléfono ya está en uso" });
+  }
+
+  const existingEmail = athletes.find((athlete: any) => athlete.email === email);
+  if (existingEmail && existingEmail.id !== id) {
+    return res.status(400).json({ message: "El email ya está en uso" });
+  }
+
+  athlete.name = name;
+  athlete.email = email;
+  athlete.phone = phone;
+  athlete.notes = notes;
+  fs.writeFileSync(dataAthletePath, JSON.stringify(athletes, null, 2));
+  return res.status(200).json({ message: "Información del atleta actualizada" });
+};
+export default { updatePaymentDate, deleteAthlete, updateAthleteBasicInfo };

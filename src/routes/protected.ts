@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { authMiddleware } from "../middleware/auth";
-import updatePaymentDate from "../controllers/protected";
+import protectedController from "../controllers/protected";
 
 const router = Router();
 
-router.post("/updatePaymentDate", authMiddleware, updatePaymentDate.updatePaymentDate);
-
-
+router.post("/updatePaymentDate", authMiddleware, protectedController.updatePaymentDate);
+router.delete("/deleteAthlete", authMiddleware, protectedController.deleteAthlete);
+router.post("/updateAthleteBasicInfo", authMiddleware, protectedController.updateAthleteBasicInfo);
 
 export default router;
 
