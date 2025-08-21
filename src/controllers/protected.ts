@@ -62,4 +62,41 @@ const updateAthleteBasicInfo = (req: any, res: any) => {
   fs.writeFileSync(dataAthletePath, JSON.stringify(athletes, null, 2));
   return res.status(200).json({ message: "Información del atleta actualizada" });
 };
-export default { updatePaymentDate, deleteAthlete, updateAthleteBasicInfo };
+
+const updateExerciseInfo = (req: any, res: any) => {
+  const { id, dayIndex, exerciseIndex, exerciseData } = req.body;
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const athletes = JSON.parse(data);
+  const athlete = athletes.find((athlete: any) => athlete.id === id);
+
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+
+  const day = athlete.routine[dayIndex];
+
+  if (!day) {
+    return res.status(404).json({ message: "Hubo un problema para actualizar el ejercicio" });
+  }
+
+  const exercise = day[exerciseIndex];
+
+  if (!exercise) {
+    return res.status(404).json({ message: "Hubo un problema para actualizar el ejercicio" });
+  }
+
+  // Only update exercise template data, preserve history and athlete data
+  const updatedExercise = {
+    ...exercise,
+    exercise: exerciseData.exercise,
+    sets: exerciseData.sets,
+    range: exerciseData.range,
+    coachNotes: exerciseData.coachNotes
+  };
+
+  day[exerciseIndex] = updatedExercise;
+
+  fs.writeFileSync(dataAthletePath, JSON.stringify(athletes, null, 2));
+  return res.status(200).json({ message: "Ejercicio actualizado" });
+};
+export default { updatePaymentDate, deleteAthlete, updateAthleteBasicInfo, updateExerciseInfo };
