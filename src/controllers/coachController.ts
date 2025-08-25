@@ -57,10 +57,10 @@ const createNewAthlete = (req: any, res: any) => {
     email,
     phone,
     coachId: decoded.id,
-    routine,
     paymentDate: "",
     notes: "",
     bodyWeight: 0,
+    routine,
   };
 
   allAthletes.push(newAthlete);

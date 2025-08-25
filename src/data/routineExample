@@ -1,0 +1,272 @@
+ "routine": [
+      [
+        {
+          "exercise": "Bench Press",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "Cuidado con el hombro",
+          "athleteNotes": "me siento bien",
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 60, "sets": [8, 8, 8] },
+            { "date": "2025-08-02", "weight": 60, "sets": [10, 10, 10] },
+            { "date": "2025-08-03", "weight": 65, "sets": [8, 8, 8] }
+          ]
+        },
+        {
+          "exercise": "Incline Dumbbell Press",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 12,
+          "coachNotes": "Sube controlado",
+          "athleteNotes": "sentí buena conexión",
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 60, "sets": [8, 8, 8] },
+            { "date": "2025-08-02", "weight": 60, "sets": [10, 10, 10] },
+            { "date": "2025-08-03", "weight": 65, "sets": [8, 8, 8] }
+          ]
+        },
+        {
+          "exercise": "Chest Fly Machine",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "Apretar al final",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 60, "sets": [8, 8, 8] },
+            { "date": "2025-08-02", "weight": 60, "sets": [10, 10, 10] },
+            { "date": "2025-08-03", "weight": 65, "sets": [8, 8, 8] }
+          ]
+        },
+        {
+          "exercise": "Triceps Pushdown",
+          "sets": 3,
+          "rangeMin": 10,
+          "rangeMax": 12,
+          "coachNotes": "Codo fijo",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 60, "sets": [8, 8, 8] },
+            { "date": "2025-08-02", "weight": 60, "sets": [10, 10, 10] },
+            { "date": "2025-08-03", "weight": 65, "sets": [8, 8, 8] }
+          ]
+        }
+      ],
+      [
+        {
+          "exercise": "Squat",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "Cuidado con la rodilla",
+          "athleteNotes": "me siento bien",
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Romanian Deadlift",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "Mantener espalda recta",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Walking Lunges",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "Paso largo",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Leg Extension",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "Pausar arriba",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        }
+      ],
+      [
+        {
+          "exercise": "Deadlift",
+          "sets": 3,
+          "rangeMin": 5,
+          "rangeMax": 6,
+          "coachNotes": "Subir explosivo",
+          "athleteNotes": "pesado pero manejable",
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Barbell Row",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "No arquear",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Pull Ups",
+          "sets": 3,
+          "rangeMin": 6,
+          "rangeMax": 10,
+          "coachNotes": "Hasta barbilla",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Face Pulls",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "Abrir codos",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        }
+      ],
+      [
+        {
+          "exercise": "Overhead Press",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "No arquear espalda",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Arnold Press",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 12,
+          "coachNotes": "Controlar rotación",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Lateral Raises",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "No subir hombros",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Rear Delt Fly",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "Abrir bien",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        }
+      ],
+      [
+        {
+          "exercise": "Barbell Curl",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "Sin balanceo",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Hammer Curl",
+          "sets": 3,
+          "rangeMin": 10,
+          "rangeMax": 12,
+          "coachNotes": "Apretar bíceps",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Skull Crushers",
+          "sets": 3,
+          "rangeMin": 8,
+          "rangeMax": 10,
+          "coachNotes": "No abrir codos",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        },
+        {
+          "exercise": "Cable Triceps Overhead",
+          "sets": 3,
+          "rangeMin": 12,
+          "rangeMax": 15,
+          "coachNotes": "Extender completo",
+          "athleteNotes": null,
+          "exerciseHistory": [
+            { "date": "2025-08-01", "weight": 80, "sets": [10, 10, 10] },
+            { "date": "2025-08-02", "weight": 80, "sets": [11, 11, 11] },
+            { "date": "2025-08-03", "weight": 80, "sets": [12, 12, 12] }
+          ]
+        }
+      ]
+    ]
