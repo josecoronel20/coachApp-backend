@@ -5,5 +5,6 @@ const router = Router();
 router.get("/:id", athleteController.getAthleteById); 
 // router.put("/exerciseUpdate", athleteController.updateExercise
 router.post("/saveSession", athleteController.saveSession);
+router.put("/updateBodyWeight", athleteController.updateBodyWeight);
 
 export default router;

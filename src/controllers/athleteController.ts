@@ -90,4 +90,17 @@ const saveSession = (req: any, res: any) => {
   return res.json({ message: "Sesión guardada con éxito", athlete });
 };
 
-export default { getAthleteById, updateExercise, saveSession };
+const updateBodyWeight = (req: any, res: any) => {
+  const { id, bodyWeight } = req.body;
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const allAthletes = JSON.parse(data);
+  const athlete = allAthletes.find((athlete: any) => athlete.id === id);
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+  athlete.bodyWeight = bodyWeight;
+  fs.writeFileSync(dataAthletePath, JSON.stringify(allAthletes, null, 2));
+  return res.status(200).json({ message: "Peso actualizado" });
+};
+
+export default { getAthleteById, updateExercise, saveSession, updateBodyWeight };
