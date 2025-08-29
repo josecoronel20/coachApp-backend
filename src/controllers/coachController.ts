@@ -100,4 +100,62 @@ const getAllAthletes = (req: any, res: any) => {
   return res.status(200).json(athletesFromCurrentCoach);
 };
 
-export default { getCoachInfo, createNewAthlete, getAthleteInfo, getAllAthletes };
+const saveSession = (req: any, res: any) => {
+  console.log("saveSession", req.body);
+  const { id, dayIndex, sessionProgress } = req.body;
+
+  // leer archivo
+  const data = fs.readFileSync(dataAthletePath, "utf8");
+  const allAthletes = JSON.parse(data);
+
+  // buscar atleta
+  const athlete = allAthletes.find((athlete: any) => athlete.id === id);
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+
+  // validar rutina y día
+  if (!athlete.routine || !athlete.routine[dayIndex]) {
+    return res.status(400).json({ message: "Día de rutina inválido" });
+  }
+
+  const dayExercises = athlete.routine[dayIndex];
+
+  // recorrer cada ejercicio de la sesión
+  sessionProgress.forEach((session: any, index: number) => {
+    const exercise = dayExercises[index];
+    if (!exercise) return; // si hay más resultados que ejercicios, lo ignora
+
+    // inicializar historial si no existe
+    if (!exercise.exerciseHistory) {
+      exercise.exerciseHistory = [];
+    }
+
+    // pushear la nueva sesión al historial
+    exercise.exerciseHistory.push({
+      date: session.date,
+      weight: session.weight,
+      sets: session.sets,
+    });
+
+    // mantener solo las últimas 5 sesiones
+    if (exercise.exerciseHistory.length > 5) {
+      exercise.exerciseHistory.shift();
+    }
+  });
+
+  // guardar archivo actualizado
+  fs.writeFileSync(
+    dataAthletePath,
+    JSON.stringify(allAthletes, null, 2),
+    "utf8"
+  );
+
+  return res.json({ message: "Sesión guardada con éxito", athlete });
+};
+
+const testController = (req: any, res: any) => {
+  return res.json({ message: "Test controller" });
+};
+
+export default { getCoachInfo, createNewAthlete, getAthleteInfo, getAllAthletes, saveSession, testController };
