@@ -6,5 +6,6 @@ router.get("/:id", athleteController.getAthleteById);
 // router.put("/exerciseUpdate", athleteController.updateExercise
 router.post("/saveSession", athleteController.saveSession);
 router.put("/updateBodyWeight", athleteController.updateBodyWeight);
+router.put("/updateRepsTracked", athleteController.updateRepsTracked);
 
 export default router;
