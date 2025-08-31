@@ -74,6 +74,11 @@ const saveSession = (req: any, res: any) => {
       sets: session.sets,
     });
 
+    // pushear las notas del atleta al ejercicio
+    if (session.athleteNotes) {
+      exercise.athleteNotes = session.athleteNotes;
+    }
+
     // mantener solo las últimas 5 sesiones
     if (exercise.exerciseHistory.length > 5) {
       exercise.exerciseHistory.shift();
