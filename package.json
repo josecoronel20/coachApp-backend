@@ -16,7 +16,10 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/uuid": "^9.0.8"
+
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
