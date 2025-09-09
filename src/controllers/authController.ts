@@ -45,11 +45,6 @@ const login = async (req: any, res: any) => {
     secure: true,
   };
 
-  // Solo agregar domain en producción
-  if (process.env.NODE_ENV === "production") {
-    cookieOptions.domain = ".onrender.com";
-  }
-
   res.cookie("token", token, cookieOptions);
   console.log("Inicio de sesión exitoso");
   return res.status(200).json({ message: "Inicio de sesión exitoso" });
