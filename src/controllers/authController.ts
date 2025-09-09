@@ -1,16 +1,12 @@
-import fs from "fs";
-import path from "path";
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
-import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 const prisma = new PrismaClient();
 
 const login = async (req: any, res: any) => {
