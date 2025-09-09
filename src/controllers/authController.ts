@@ -92,12 +92,30 @@ const logout = (req: any, res: any) => {
   return res.status(200).json({ message: "Cierre de sesión exitoso" });
 };
 
-const isAuthenticated = (req: any, res: any) => {
-  const token = req.cookies.token;
-  if (!token) {
+const isAuthenticated = async (req: any, res: any) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No autorizado" });
+    }
+
+    // Validar el token JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    
+    // Verificar que el coach existe
+    const coach = await prisma.coach.findUnique({
+      where: { id: decoded.id },
+    });
+
+    if (!coach) {
+      return res.status(401).json({ message: "No autorizado" });
+    }
+
+    return res.status(200).json({ message: "Autorizado", coach: { id: coach.id, email: coach.email } });
+  } catch (error) {
+    console.error("Error in isAuthenticated:", error);
     return res.status(401).json({ message: "No autorizado" });
   }
-  return res.status(200).json({ message: "Autorizado" });
 };
 
 export default { login, register, logout, isAuthenticated };

@@ -8,23 +8,29 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 const getCoachInfo = async (req: any, res: any) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No autorizado" });
+    }
 
-  //get coach info from token
-  const token = req.cookies.token;
-  const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
-  const coach = await prisma.coach.findUnique({
-    where: {
-      id: decoded.id.toString(),
-    },
-  });
+    const coach = await prisma.coach.findUnique({
+      where: {
+        id: decoded.id,
+      },
+    });
 
+    if (!coach) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
-  if (!coach) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(200).json(coach);
+  } catch (error) {
+    console.error("Error in getCoachInfo:", error);
+    return res.status(401).json({ message: "No autorizado" });
   }
-
-  return res.status(200).json(coach);
 };
 
 const createNewAthlete = async (req: any, res: any) => {
