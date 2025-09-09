@@ -103,9 +103,9 @@ const updateRoutine = async (req: any, res: any) => {
                   where: { id: existingExercise.id },
                   data: {
                     exercise: exerciseData.exercise,
-                    sets: parseInt(exerciseData.sets),
-                    rangeMin: parseInt(exerciseData.rangeMin),
-                    rangeMax: parseInt(exerciseData.rangeMax),
+                    sets: parseInt(exerciseData.sets) || 0,
+                    rangeMin: parseInt(exerciseData.rangeMin) || 0,
+                    rangeMax: parseInt(exerciseData.rangeMax) || 0,
                     coachNotes: exerciseData.coachNotes || "",
                     athleteNotes: exerciseData.athleteNotes || "",
                   }
@@ -116,9 +116,9 @@ const updateRoutine = async (req: any, res: any) => {
                   data: {
                     routineDayId: existingDay.id,
                     exercise: exerciseData.exercise,
-                    sets: parseInt(exerciseData.sets),
-                    rangeMin: parseInt(exerciseData.rangeMin),
-                    rangeMax: parseInt(exerciseData.rangeMax),
+                    sets: parseInt(exerciseData.sets) || 0,
+                    rangeMin: parseInt(exerciseData.rangeMin) || 0,
+                    rangeMax: parseInt(exerciseData.rangeMax) || 0,
                     coachNotes: exerciseData.coachNotes || "",
                     athleteNotes: exerciseData.athleteNotes || "",
                   }
@@ -156,9 +156,9 @@ const updateRoutine = async (req: any, res: any) => {
               data: day.map((exercise: any) => ({
                 routineDayId: newDay.id,
                 exercise: exercise.exercise,
-                sets: parseInt(exercise.sets),
-                rangeMin: parseInt(exercise.rangeMin),
-                rangeMax: parseInt(exercise.rangeMax),
+                sets: parseInt(exercise.sets) || 0,
+                rangeMin: parseInt(exercise.rangeMin) || 0,
+                rangeMax: parseInt(exercise.rangeMax) || 0,
                 coachNotes: exercise.coachNotes || "",
                 athleteNotes: exercise.athleteNotes || "",
               }))
@@ -172,6 +172,9 @@ const updateRoutine = async (req: any, res: any) => {
       const daysToDelete = existingDays.filter(d => !newDayIndexes.includes(d.dayIndex));
       
       for (const dayToDelete of daysToDelete) {
+        await tx.exercise.deleteMany({
+          where: { routineDayId: dayToDelete.id }
+        });
         await tx.routineDay.delete({
           where: { id: dayToDelete.id }
         });

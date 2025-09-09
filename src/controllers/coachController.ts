@@ -84,47 +84,54 @@ const createNewAthlete = async (req: any, res: any) => {
 };
 
 const getAthleteInfo = async (req: any, res: any) => {
-  const { id: athleteId } = req.params;
+  try {
+    const { id: athleteId } = req.params;
 
-  const athlete = await prisma.athlete.findUnique({
-    where: {
-      id: athleteId,
-    },
-    include: {
-      routine: {
-        include: {
-          exercises: true,
-        },
-        orderBy: {
-          dayIndex: 'asc',
+    const athlete = await prisma.athlete.findUnique({
+      where: {
+        id: athleteId,
+      },
+      include: {
+        routine: {
+          include: {
+            exercises: {
+              include: { history: { orderBy: { createdAt: 'desc' }, take: 1 } },
+            },
+          },
+          orderBy: {
+            dayIndex: 'asc',
+          },
         },
       },
-    },
-  });
+    });
 
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
+    if (!athlete) {
+      return res.status(404).json({ message: "Atleta no encontrado" });
+    }
+
+    // Transformar la rutina para que coincida con la estructura del frontend
+    const transformedRoutine = athlete.routine.map(day => 
+      day.exercises.map(exercise => ({
+        exercise: exercise.exercise,
+        sets: exercise.sets,
+        rangeMin: exercise.rangeMin,
+        rangeMax: exercise.rangeMax,
+        coachNotes: exercise.coachNotes,
+        athleteNotes: exercise.athleteNotes,
+        exerciseHistory: exercise.history.length > 0 ? [exercise.history[0]] : null, // Incluir historial
+      }))
+    );
+
+    const transformedAthlete = {
+      ...athlete,
+      routine: transformedRoutine,
+    };
+
+    return res.status(200).json(transformedAthlete);
+  } catch (error) {
+    console.error("Error in getAthleteInfo:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
   }
-
-  // Transformar la rutina para que coincida con la estructura del frontend
-  const transformedRoutine = athlete.routine.map(day => 
-    day.exercises.map(exercise => ({
-      exercise: exercise.exercise,
-      sets: exercise.sets,
-      rangeMin: exercise.rangeMin,
-      rangeMax: exercise.rangeMax,
-      coachNotes: exercise.coachNotes,
-      athleteNotes: exercise.athleteNotes,
-      exerciseHistory: null, // Por ahora null, se puede implementar después
-    }))
-  );
-
-  const transformedAthlete = {
-    ...athlete,
-    routine: transformedRoutine,
-  };
-
-  return res.status(200).json(transformedAthlete);
 };
 
 const getAllAthletes = async (req: any, res: any) => {
