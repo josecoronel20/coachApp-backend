@@ -1,25 +1,23 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { PrismaClient } from "@prisma/client";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dataCoachPath = path.join(__dirname, "../data/coachData.json");
-const dataAthletePath = path.join(__dirname, "../data/athletesData.json");
+const prisma = new PrismaClient();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-const getCoachInfo = (req: any, res: any) => {
-  const data = fs.readFileSync(dataCoachPath, "utf8");
-  const coachs = JSON.parse(data);
+const getCoachInfo = async (req: any, res: any) => {
 
   //get coach info from token
   const token = req.cookies.token;
   const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
-  const coach = coachs.find((coach: any) => coach.id === decoded.id.toString());
+  const coach = await prisma.coach.findUnique({
+    where: {
+      id: decoded.id.toString(),
+    },
+  });
 
 
   if (!coach) {
@@ -29,133 +27,113 @@ const getCoachInfo = (req: any, res: any) => {
   return res.status(200).json(coach);
 };
 
-const createNewAthlete = (req: any, res: any) => {
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const allAthletes = JSON.parse(data);
-  const { name, email, phone, routine } = req.body;
+const createNewAthlete = async (req: any, res: any) => {
+  try {
+    console.log("se ejecuto createNewAthlete");
+    const { name, email, phone, routine } = req.body;
 
-  const existingAthlete = allAthletes.find(
-    (athlete: any) => athlete.phone === phone
-  );
-
-  if (existingAthlete) {
-    console.log("Este número ya está asociado a un atleta");
-    return res.status(400).json({ message: "Este número ya está asociado a un atleta" });
-  }
-
-  // Get coach ID from token
-  const token = req.cookies.token;
-  const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-
-  if (!decoded) {
-    return res.status(401).json({ message: "No se pudo obtener el ID del entrenador, vuelva a iniciar sesión" });
-  }
-
-  const newAthlete = {
-    id: uuidv4(),
-    name,
-    email,
-    phone,
-    coachId: decoded.id,
-    paymentDate: "",
-    notes: "",
-    bodyWeight: 0,
-    routine,
-  };
-
-  allAthletes.push(newAthlete);
-
-  console.log("allAthletes", allAthletes);
-  fs.writeFileSync(dataAthletePath, JSON.stringify(allAthletes, null, 2));
-
-  return res.status(201).json({
-    message: "Atleta creado exitosamente",
-    athlete: newAthlete
-  });
-};
-
-const getAthleteInfo = (req: any, res: any) => {
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const allAthletes = JSON.parse(data);
-  const { id } = req.params;
-
-  const athlete = allAthletes.find((athlete: any) => athlete.id === id);
-
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
-  }
-
-  return res.status(200).json(athlete);
-};
-
-const getAllAthletes = (req: any, res: any) => {
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const allAthletes = JSON.parse(data);
-
-  const token = req.cookies.token;
-  const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-
-  const athletesFromCurrentCoach = allAthletes.filter((athlete: any) => athlete.coachId === decoded.id);
-
-  return res.status(200).json(athletesFromCurrentCoach);
-};
-
-const saveSession = (req: any, res: any) => {
-  console.log("saveSession", req.body);
-  const { id, dayIndex, sessionProgress } = req.body;
-
-  // leer archivo
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const allAthletes = JSON.parse(data);
-
-  // buscar atleta
-  const athlete = allAthletes.find((athlete: any) => athlete.id === id);
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
-  }
-
-  // validar rutina y día
-  if (!athlete.routine || !athlete.routine[dayIndex]) {
-    return res.status(400).json({ message: "Día de rutina inválido" });
-  }
-
-  const dayExercises = athlete.routine[dayIndex];
-
-  // recorrer cada ejercicio de la sesión
-  sessionProgress.forEach((session: any, index: number) => {
-    const exercise = dayExercises[index];
-    if (!exercise) return; // si hay más resultados que ejercicios, lo ignora
-
-    // inicializar historial si no existe
-    if (!exercise.exerciseHistory) {
-      exercise.exerciseHistory = [];
+    const existingAthlete = await prisma.athlete.findUnique({
+      where: {
+        phone,
+      },
+    });
+      
+    if (existingAthlete) {
+      console.log("Este número ya está asociado a un atleta");
+      return res.status(400).json({ message: "Este número ya está asociado a un atleta" });
     }
 
-    // pushear la nueva sesión al historial
-    exercise.exerciseHistory.push({
-      date: session.date,
-      weight: session.weight,
-      sets: session.sets,
+    // Get coach ID from token
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+
+    if (!decoded) {
+      return res.status(401).json({ message: "No se pudo obtener el ID del entrenador, vuelva a iniciar sesión" });
+    }
+
+    const newAthlete = {
+      id: uuidv4(),
+      name,
+      email,
+      phone,
+      coachId: decoded.id,
+      paymentDate: "",
+      repsTracked: false,
+      notes: "",
+      bodyWeight: 0,
+    };
+
+    await prisma.athlete.create({
+      data: newAthlete,
     });
 
-    // mantener solo las últimas 5 sesiones
-    if (exercise.exerciseHistory.length > 5) {
-      exercise.exerciseHistory.shift();
-    }
+    return res.status(201).json({
+      message: "Atleta creado exitosamente",
+      athlete: newAthlete
+    });
+  } catch (error) {
+    console.error("Error creating athlete:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+const getAthleteInfo = async (req: any, res: any) => {
+  const { id: athleteId } = req.params;
+
+  const athlete = await prisma.athlete.findUnique({
+    where: {
+      id: athleteId,
+    },
+    include: {
+      routine: {
+        include: {
+          exercises: true,
+        },
+        orderBy: {
+          dayIndex: 'asc',
+        },
+      },
+    },
   });
 
-  // guardar archivo actualizado
-  fs.writeFileSync(
-    dataAthletePath,
-    JSON.stringify(allAthletes, null, 2),
-    "utf8"
+  if (!athlete) {
+    return res.status(404).json({ message: "Atleta no encontrado" });
+  }
+
+  // Transformar la rutina para que coincida con la estructura del frontend
+  const transformedRoutine = athlete.routine.map(day => 
+    day.exercises.map(exercise => ({
+      exercise: exercise.exercise,
+      sets: exercise.sets,
+      rangeMin: exercise.rangeMin,
+      rangeMax: exercise.rangeMax,
+      coachNotes: exercise.coachNotes,
+      athleteNotes: exercise.athleteNotes,
+      exerciseHistory: null, // Por ahora null, se puede implementar después
+    }))
   );
 
-  return res.json({ message: "Sesión guardada con éxito", athlete });
+  const transformedAthlete = {
+    ...athlete,
+    routine: transformedRoutine,
+  };
+
+  return res.status(200).json(transformedAthlete);
 };
 
-const testController = (req: any, res: any) => {
-  return res.json({ message: "Test controller" });
+const getAllAthletes = async (req: any, res: any) => {
+  const token = req.cookies.token;
+  const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+
+  const allAthletesFromCurrentCoach = await prisma.athlete.findMany({
+    where: {
+      coachId: decoded.id,
+    },
+  });
+
+
+  return res.status(200).json(allAthletesFromCurrentCoach);
 };
 
-export default { getCoachInfo, createNewAthlete, getAthleteInfo, getAllAthletes, saveSession, testController };
+
+export default { getCoachInfo, createNewAthlete, getAthleteInfo, getAllAthletes };

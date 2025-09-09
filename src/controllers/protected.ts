@@ -1,82 +1,156 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dataAthletePath = path.join(__dirname, "../data/athletesData.json");
+import { PrismaClient } from "@prisma/client";
 
-const updatePaymentDate = (req: any, res: any) => {
+const prisma = new PrismaClient();
+
+const updatePaymentDate = async (req: any, res: any) => {
   const { paymentDate, id } = req.body;
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const athletes = JSON.parse(data);
-  const athlete = athletes.find((athlete: any) => athlete.id === id);
 
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
+  try {
+    await prisma.athlete.update({
+      where: {
+        id: id,
+      },
+      data: {
+        paymentDate: paymentDate,
+      },
+    });
+    return res.status(200).json({ message: "Fecha de pago actualizada" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error al actualizar la fecha de pago" });
   }
-
-  athlete.paymentDate = paymentDate;
-  fs.writeFileSync(dataAthletePath, JSON.stringify(athletes, null, 2));
-  return res.status(200).json({ message: "Fecha de pago actualizada" });
 };
 
-const deleteAthlete = (req: any, res: any) => {
+const deleteAthlete = async (req: any, res: any) => {
   const { id } = req.body;
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const athletes = JSON.parse(data);
-  const athlete = athletes.find((athlete: any) => athlete.id === id);
-
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
+  try {
+    await prisma.athlete.delete({
+      where: {
+        id: id,
+      },
+      include: {
+        routine: true,
+        sessions: true,
+      },
+    });
+    return res.status(200).json({ message: "Atleta eliminado" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error al eliminar el atleta" });
   }
-  const newAthletes = athletes.filter((athlete: any) => athlete.id !== id);
-  fs.writeFileSync(dataAthletePath, JSON.stringify(newAthletes, null, 2));
-  return res.status(200).json({ message: "Atleta eliminado" });
 };
 
-const updateAthleteBasicInfo = (req: any, res: any) => {
-  const { id,name, email, phone, notes } = req.body;
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const athletes = JSON.parse(data);
-  const athlete = athletes.find((athlete: any) => athlete.id === id);
+const updateAthleteBasicInfo = async (req: any, res: any) => {
+  const { id, name, email, phone, notes } = req.body;
 
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
+  try {
+    await prisma.athlete.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: name,
+        email: email,
+        phone: phone,
+        notes: notes,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "Información del atleta actualizada" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error al actualizar la información del atleta" });
   }
-
-  const existingPhone = athletes.find((athlete: any) => athlete.phone === phone);
-  if (existingPhone && existingPhone.id !== id) {
-    return res.status(400).json({ message: "El teléfono ya está en uso" });
-  }
-
-  const existingEmail = athletes.find((athlete: any) => athlete.email === email);
-  if (existingEmail && existingEmail.id !== id) {
-    return res.status(400).json({ message: "El email ya está en uso" });
-  }
-
-  athlete.name = name;
-  athlete.email = email;
-  athlete.phone = phone;
-  athlete.notes = notes;
-  fs.writeFileSync(dataAthletePath, JSON.stringify(athletes, null, 2));
-  return res.status(200).json({ message: "Información del atleta actualizada" });
 };
 
-const updateRoutine = (req: any, res: any) => {
+const updateRoutine = async (req: any, res: any) => {
   const { idAthlete, routine } = req.body;
-  const data = fs.readFileSync(dataAthletePath, "utf8");
-  const athletes = JSON.parse(data);
-  const athlete = athletes.find((athlete: any) => athlete.id === idAthlete);
+  
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Obtener los días existentes
+      const existingDays = await tx.routineDay.findMany({
+        where: { athleteId: idAthlete },
+        include: { exercises: true },
+        orderBy: { dayIndex: 'asc' }
+      });
 
-  if (!athlete) {
-    return res.status(404).json({ message: "Atleta no encontrado" });
+      // Procesar cada día de la nueva rutina
+      for (let dayIndex = 0; dayIndex < routine.length; dayIndex++) {
+        const day = routine[dayIndex];
+        const existingDay = existingDays.find(d => d.dayIndex === dayIndex);
+
+        if (existingDay) {
+          // Día existente - actualizar ejercicios
+          if (day && day.length > 0) {
+            // Eliminar ejercicios existentes
+            await tx.exercise.deleteMany({
+              where: { routineDayId: existingDay.id }
+            });
+
+            // Crear nuevos ejercicios
+            await tx.exercise.createMany({
+              data: day.map((exercise: any) => ({
+                routineDayId: existingDay.id,
+                exercise: exercise.exercise,
+                sets: parseInt(exercise.sets),
+                rangeMin: parseInt(exercise.rangeMin),
+                rangeMax: parseInt(exercise.rangeMax),
+                coachNotes: exercise.coachNotes || "",
+                athleteNotes: exercise.athleteNotes || "",
+              }))
+            });
+          } else {
+            // Día vacío - eliminar ejercicios existentes
+            await tx.exercise.deleteMany({
+              where: { routineDayId: existingDay.id }
+            });
+          }
+        } else {
+          // Día nuevo - crear
+          const newDay = await tx.routineDay.create({
+            data: {
+              athleteId: idAthlete,
+              dayIndex: dayIndex,
+            }
+          });
+
+          if (day && day.length > 0) {
+            // Crear ejercicios para el nuevo día
+            await tx.exercise.createMany({
+              data: day.map((exercise: any) => ({
+                routineDayId: newDay.id,
+                exercise: exercise.exercise,
+                sets: parseInt(exercise.sets),
+                rangeMin: parseInt(exercise.rangeMin),
+                rangeMax: parseInt(exercise.rangeMax),
+                coachNotes: exercise.coachNotes || "",
+                athleteNotes: exercise.athleteNotes || "",
+              }))
+            });
+          }
+        }
+      }
+
+      // Eliminar días que ya no existen en la nueva rutina
+      const newDayIndexes = routine.map((_: any, index: number) => index);
+      const daysToDelete = existingDays.filter(d => !newDayIndexes.includes(d.dayIndex));
+      
+      for (const dayToDelete of daysToDelete) {
+        await tx.routineDay.delete({
+          where: { id: dayToDelete.id }
+        });
+      }
+    });
+
+    return res.status(200).json({ message: "Rutina actualizada" });
+  } catch (error) {
+    console.error("Error al actualizar la rutina:", error);
+    return res.status(500).json({ message: "Error al actualizar la rutina" });
   }
-
-  athlete.routine = routine;
-
-  fs.writeFileSync(dataAthletePath, JSON.stringify(athletes, null, 2));
-  return res.status(200).json({ message: "Rutina actualizada" });
 };
 
 export default {

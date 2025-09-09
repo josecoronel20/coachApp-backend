@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Coach {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  athletes  Athlete[]
+
+  @@index([email])
+  @@map("coaches")
+}
+
+model Athlete {
+  id           String   @id @default(uuid())
+  coachId      String
+  name         String
+  email        String
+  phone        String   @unique
+  bodyWeight   Float    @default(0)
+  paymentDate  String   @default("")
+  notes        String   @default("")
+  repsTracked  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  coach        Coach         @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  routine      RoutineDay[]
+  sessions     Session[]
+
+  @@index([coachId])
+  @@index([phone])
+  @@map("athletes")
+}
+
+model RoutineDay {
+  id        String   @id @default(uuid())
+  athleteId String
+  dayIndex  Int      // 0-based index for the day of the week
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  athlete   Athlete    @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  exercises Exercise[]
+
+  @@unique([athleteId, dayIndex])
+  @@map("routine_days")
+}
+
+model Exercise {
+  id           String   @id @default(uuid())
+  routineDayId String
+  exercise     String   // Name of the exercise
+  sets         Int      // Number of sets
+  rangeMin     Int      // Minimum reps
+  rangeMax     Int      // Maximum reps
+  coachNotes   String   @default("")
+  athleteNotes String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  routineDay   RoutineDay     @relation(fields: [routineDayId], references: [id], onDelete: Cascade)
+  history      ExerciseHistory[]
+
+  @@map("exercises")
+}
+
+model ExerciseHistory {
+  id         String   @id @default(uuid())
+  exerciseId String
+  date       String   // Date of the session (YYYY-MM-DD format)
+  weight     Float    // Weight used
+  sets       Int[]    // Array of reps for each set
+  createdAt  DateTime @default(now())
+
+  // Relations
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseId, date])
+  @@map("exercise_history")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  athleteId String
+  dayIndex  Int      // Which day of the routine this session was for
+  date      String   // Date of the session (YYYY-MM-DD format)
+  createdAt DateTime @default(now())
+
+  // Relations
+  athlete   Athlete        @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  exercises SessionExercise[]
+
+  @@index([athleteId, date])
+  @@map("sessions")
+}
+
+model SessionExercise {
+  id           String   @id @default(uuid())
+  sessionId    String
+  exerciseId   String   // Reference to the exercise template
+  weight       Float    // Weight used in this session
+  sets         Int[]    // Array of reps for each set
+  athleteNotes String   @default("")
+  createdAt    DateTime @default(now())
+
+  // Relations
+  session      Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("session_exercises")
+}
+
+

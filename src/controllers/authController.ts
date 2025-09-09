@@ -5,20 +5,22 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
+import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dataPath = path.join(__dirname, "../data/coachData.json");
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+const prisma = new PrismaClient();
 
-const login = (req: any, res: any) => {
-  const data = fs.readFileSync(dataPath, "utf8");
-  const coachs = JSON.parse(data);
-
+const login = async (req: any, res: any) => {
   const { email, password } = req.body;
   console.log("email", email);
-  const coach = coachs.find((coach: any) => coach.email === email);
+  const coach = await prisma.coach.findUnique({
+    where: {
+      email,
+    },
+  });
   console.log("coach", coach);
 
   //if coach not found return 401
@@ -50,13 +52,14 @@ const login = (req: any, res: any) => {
   return res.status(200).json({ message: "Inicio de sesión exitoso" });
 };
 
-const register = (req: any, res: any) => {
+const register = async (req: any, res: any) => {
   const { email, password, name, confirmPassword } = req.body;
 
-  const data = fs.readFileSync(dataPath, "utf8");
-  const coachs = JSON.parse(data);
-
-  const existingCoach = coachs.find((coach: any) => coach.email === email);
+  const existingCoach = await prisma.coach.findUnique({
+    where: {
+      email,
+    },
+  });
 
   //if email already exists return 400
   if (existingCoach) {
@@ -76,8 +79,9 @@ const register = (req: any, res: any) => {
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   const coach = { id: uuidv4(), email, password: hashedPassword, name };
-  coachs.push(coach);
-  fs.writeFileSync(dataPath, JSON.stringify(coachs, null, 2));
+  await prisma.coach.create({
+    data: coach,
+  });
 
   console.log("Registro exitoso");
   return res.status(200).json({ message: "Registro exitoso" });
