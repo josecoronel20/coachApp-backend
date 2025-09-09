@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import protectedRoutes from "./routes/protected";
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://gymbrocoach.vercel.app"],
   credentials: true,
 };
 
@@ -30,5 +30,5 @@ app.use("/api/protected", protectedRoutes);
 //athletes routes
 app.use("/api/athletes", athletesRoutes);
 
-
-app.listen(3001, () => console.log("Server running on 3001"));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
