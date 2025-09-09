@@ -42,12 +42,19 @@ const login = async (req: any, res: any) => {
   });
 
   //save token in cookie
-  res.cookie("token", token, {
+  const cookieOptions: any = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 3600000,
-    sameSite: "lax",
-  });
+    maxAge: 3600000, // 1 hora
+    sameSite: "none" as const,
+    secure: true,
+  };
+
+  // Solo agregar domain en producción
+  if (process.env.NODE_ENV === "production") {
+    cookieOptions.domain = ".onrender.com";
+  }
+
+  res.cookie("token", token, cookieOptions);
   console.log("Inicio de sesión exitoso");
   return res.status(200).json({ message: "Inicio de sesión exitoso" });
 };

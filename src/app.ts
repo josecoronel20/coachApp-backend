@@ -7,8 +7,12 @@ import cookieParser from "cookie-parser";
 import protectedRoutes from "./routes/protected";
 
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://gymbrocoach.vercel.app"],
+  origin: [
+    "http://localhost:3000", 
+    "https://gymbrocoach.vercel.app"
+  ],
   credentials: true,
+  optionsSuccessStatus: 200, // Agregar esto
 };
 
 const app = express();
