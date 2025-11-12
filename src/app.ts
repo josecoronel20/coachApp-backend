@@ -8,11 +8,16 @@ import protectedRoutes from "./routes/protected";
 
 const corsOptions = {
   origin: [
-    "http://localhost:3000", 
-    "https://gymbrocoach.vercel.app"
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://gymbrocoach.vercel.app",
+    "https://coachapp-backend.onrender.com",
+    "https://coachapp-backend-x14u.onrender.com"
   ],
   credentials: true,
-  optionsSuccessStatus: 200, // Agregar esto
+  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 const app = express();
