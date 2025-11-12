@@ -36,7 +36,7 @@ const getCoachInfo = async (req: any, res: any) => {
 const createNewAthlete = async (req: any, res: any) => {
   try {
     console.log("se ejecuto createNewAthlete");
-    const { name, email, phone, routine } = req.body;
+    const { name, email, phone, routine, diet = "" } = req.body;
 
     const existingAthlete = await prisma.athlete.findUnique({
       where: {
@@ -67,6 +67,7 @@ const createNewAthlete = async (req: any, res: any) => {
       repsTracked: false,
       notes: "",
       bodyWeight: 0,
+      diet,
     };
 
     await prisma.athlete.create({

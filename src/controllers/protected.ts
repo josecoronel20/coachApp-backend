@@ -66,6 +66,24 @@ const updateAthleteBasicInfo = async (req: any, res: any) => {
   }
 };
 
+const updateAthleteDiet = async (req: any, res: any) => {
+  const { id, diet } = req.body;
+
+  try {
+    await prisma.athlete.update({
+      where: { id },
+      data: { diet: diet ?? "" },
+    });
+
+    return res.status(200).json({ message: "Dieta actualizada" });
+  } catch (error) {
+    console.error("Error al actualizar la dieta:", error);
+    return res
+      .status(500)
+      .json({ message: "Error al actualizar la dieta del atleta" });
+  }
+};
+
 const updateRoutine = async (req: any, res: any) => {
   const { idAthlete, routine } = req.body;
   
@@ -193,4 +211,5 @@ export default {
   deleteAthlete,
   updateAthleteBasicInfo,
   updateRoutine,
+  updateAthleteDiet,
 };

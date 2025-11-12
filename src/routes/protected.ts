@@ -8,6 +8,7 @@ router.post("/updatePaymentDate", authMiddleware, protectedController.updatePaym
 router.delete("/deleteAthlete", authMiddleware, protectedController.deleteAthlete);
 router.post("/updateAthleteBasicInfo", authMiddleware, protectedController.updateAthleteBasicInfo);
 router.post("/updateRoutine", authMiddleware, protectedController.updateRoutine);
+router.post("/updateAthleteDiet", authMiddleware, protectedController.updateAthleteDiet);
 
 export default router;
 
