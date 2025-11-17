@@ -23,8 +23,6 @@ const corsOptions = {
 
 const app = express();
 app.use(cors(corsOptions));
-// Manejar preflight requests explícitamente
-app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
