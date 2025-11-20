@@ -134,17 +134,60 @@ const getAthleteInfo = async (req: any, res: any) => {
 };
 
 const getAllAthletes = async (req: any, res: any) => {
-  const token = req.cookies.token;
-  const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+  try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
 
-  const allAthletesFromCurrentCoach = await prisma.athlete.findMany({
-    where: {
-      coachId: decoded.id,
-    },
-  });
+    const allAthletesFromCurrentCoach = await prisma.athlete.findMany({
+      where: {
+        coachId: decoded.id,
+      },
+      include: {
+        routine: {
+          include: {
+            exercises: {
+              include: {
+                history: {
+                  orderBy: {
+                    createdAt: 'desc',
+                  },
+                  take: 1,
+                },
+              },
+            },
+          },
+          orderBy: {
+            dayIndex: 'asc',
+          },
+        },
+      },
+    });
 
+    // Transformar la rutina para cada atleta
+    const transformedAthletes = allAthletesFromCurrentCoach.map(athlete => {
+      const transformedRoutine = athlete.routine.map(day =>
+        day.exercises.map(exercise => ({
+          exercise: exercise.exercise,
+          sets: exercise.sets,
+          rangeMin: exercise.rangeMin,
+          rangeMax: exercise.rangeMax,
+          coachNotes: exercise.coachNotes,
+          athleteNotes: exercise.athleteNotes,
+          exerciseHistory: exercise.history.length > 0 ? [exercise.history[0]] : null,
+        }))
+      );
 
-  return res.status(200).json(allAthletesFromCurrentCoach);
+      return {
+        ...athlete,
+        routine: transformedRoutine,
+      };
+    });
+
+    return res.status(200).json(transformedAthletes);
+  } catch (error) {
+    console.error("Error in getAllAthletes:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
 };
 
 
